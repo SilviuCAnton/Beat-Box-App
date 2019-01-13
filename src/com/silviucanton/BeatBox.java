@@ -1,10 +1,25 @@
 package com.silviucanton;
 
-import javax.swing.*;
-import javax.sound.midi.*;
-import java.util.*;
-import java.awt.*;
-import java.awt.event.*;
+import java.awt.BorderLayout;
+import java.awt.GridLayout;
+import java.awt.Label;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
+
+import javax.sound.midi.MidiEvent;
+import javax.sound.midi.MidiSystem;
+import javax.sound.midi.Sequence;
+import javax.sound.midi.Sequencer;
+import javax.sound.midi.ShortMessage;
+import javax.sound.midi.Track;
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
 
 public class BeatBox {
 	
@@ -100,27 +115,69 @@ public class BeatBox {
 		}
 	}
 	
+	public void buildTracksAndStart() {
+		/*
+		 * Construieste track-urile si da drumul la sequencer
+		 */
+		int[] trackList = null;
+		
+		sequence.deleteTrack(track);
+		track = sequence.createTrack();
+		
+		for (int i = 0; i < 16; i++) {
+			trackList = new int[16];
+			
+			int key = instruments[i];
+			
+			for (int j = 0; j < 16; j++) {
+				
+				JCheckBox jc = checkBoxList.get(j + 16 * i);
+				if (jc.isSelected()) {
+					trackList[j] = key;
+				} else {
+					trackList[j] = 0;
+				}
+			}
+			
+			makeTracks(trackList);
+			track.add(makeEvent(176, 1, 127, 0, 16));
+		}
+		
+		track.add(makeEvent(176, 1, 127, 0, 16));
+		try {
+			
+			sequencer.setSequence(sequence);
+			sequencer.setLoopCount(Sequencer.LOOP_CONTINUOUSLY);
+			sequencer.start();
+			sequencer.setTempoInBPM(120);
+		} catch(Exception ex) {
+			ex.printStackTrace();
+		}
+	}
+	
 	public class MyStartListener implements ActionListener {
 		public void actionPerformed(ActionEvent a) {
-			
+			buildTracksAndStart();
 		}
 	}
 	
 	public class MyStopListener implements ActionListener {
 		public void actionPerformed(ActionEvent a) {
-			
+			sequencer.stop();
 		}
 	}
 	
 	public class MyUpTempoListener implements ActionListener {
 		public void actionPerformed(ActionEvent a) {
-			
+			float tempoFactor = sequencer.getTempoFactor();
+			sequencer.setTempoFactor((float) (tempoFactor * 1.03));
 		}
 	}
 	
 	public class MyDownTempoListener implements ActionListener {
 		public void actionPerformed(ActionEvent a) {
-			
+			float tempoFactor = sequencer.getTempoFactor();
+			sequencer.setTempoFactor((float) (tempoFactor * .97));
 		}
 	}
 	
