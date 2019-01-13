@@ -26,6 +26,9 @@ public class BeatBox {
 	}
 	
 	public void buildGUI() {
+		/*
+		 * Construieste GUI si initializeaza Sequencer-ul
+		 */
 		theFrame = new JFrame("Cyber BeatBox");
 		theFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		BorderLayout layout = new BorderLayout();
@@ -82,6 +85,9 @@ public class BeatBox {
 	}
 	
 	public void setUpMidi() {
+		/*
+		 * Initializeaza sequencer-ul
+		 */
 		try {
 			sequencer = MidiSystem.getSequencer();
 			sequencer.open();
@@ -116,6 +122,37 @@ public class BeatBox {
 		public void actionPerformed(ActionEvent a) {
 			
 		}
+	}
+	
+	public void makeTracks(int[] lst) {
+		/*
+		 * creaza MidiEvents pentru fiecare instrument in parte - daca este bifat, atunci il adauga la track
+		 */
+		for (int i = 0; i < 16; i++) {
+			int key = lst[i];
+			
+			if (key != 0) {
+				track.add(makeEvent(144, 9, key, 100, i));
+				track.add(makeEvent(128, 9, key, 100, i+1));
+			}
+		}
+	}
+	
+	public MidiEvent makeEvent(int cmd, int chan, int one, int two, int tick) {
+		/*
+		 * Creeaza un MidiEvent
+		 */
+		MidiEvent event = null;
+		try {
+			ShortMessage a = new ShortMessage();
+			a.setMessage(cmd, chan, one, two);
+			event = new MidiEvent(a, tick);
+			
+		} catch(Exception ex) {
+			ex.printStackTrace();
+		}
+		
+		return event;
 	}
 
 }
