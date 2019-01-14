@@ -69,6 +69,10 @@ public class BeatBox {
 		downTempo.addActionListener(new MyDownTempoListener());
 		buttonBox.add(downTempo);
 		
+		JButton reset = new JButton("Reset");
+		reset.addActionListener(new MyResetActionListener());
+		buttonBox.add(reset);
+		
 		Box nameBox = new Box(BoxLayout.Y_AXIS);
 		for (int i = 0; i < 16; i++) {
 			nameBox.add(new Label(instrumentNames[i]));
@@ -178,6 +182,17 @@ public class BeatBox {
 		public void actionPerformed(ActionEvent a) {
 			float tempoFactor = sequencer.getTempoFactor();
 			sequencer.setTempoFactor((float) (tempoFactor * .97));
+		}
+	}
+	
+	public class MyResetActionListener implements ActionListener {
+		public void actionPerformed(ActionEvent a) {
+			for (int i = 0; i < 16; i++) {
+				for (int j = 0; j < 16; j++) {
+					JCheckBox c = checkBoxList.get(j + 16 * i);
+					c.setSelected(false);
+				}
+			}
 		}
 	}
 	
