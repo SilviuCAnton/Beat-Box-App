@@ -5,6 +5,11 @@ import java.awt.GridLayout;
 import java.awt.Label;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 
 import javax.sound.midi.MidiEvent;
@@ -73,6 +78,14 @@ public class BeatBox {
 		reset.addActionListener(new MyResetActionListener());
 		buttonBox.add(reset);
 		
+		JButton serializeIt = new JButton("Serialize it");
+		serializeIt.addActionListener(new MySendListener());
+		buttonBox.add(serializeIt);
+		
+		JButton restore = new JButton("Restore");
+		restore.addActionListener(new MyReadInListener());
+		buttonBox.add(restore);
+		
 		Box nameBox = new Box(BoxLayout.Y_AXIS);
 		for (int i = 0; i < 16; i++) {
 			nameBox.add(new Label(instrumentNames[i]));
@@ -119,7 +132,7 @@ public class BeatBox {
 		}
 	}
 	
-	public void buildTracksAndStart() {
+	public void buildTrackAndStart() {
 		/*
 		 * Construieste track-urile si da drumul la sequencer
 		 */
@@ -161,7 +174,7 @@ public class BeatBox {
 	
 	public class MyStartListener implements ActionListener {
 		public void actionPerformed(ActionEvent a) {
-			buildTracksAndStart();
+			buildTrackAndStart();
 		}
 	}
 	
@@ -193,6 +206,56 @@ public class BeatBox {
 					c.setSelected(false);
 				}
 			}
+		}
+	}
+	
+	public class MySendListener implements ActionListener {
+		public void actionPerformed(ActionEvent a) {
+			
+			boolean[] checkBoxState = new boolean[256];
+			
+			for (int i = 0; i < 256; i++) {
+				
+				JCheckBox check = (JCheckBox) checkBoxList.get(i);
+				if (check.isSelected()) {
+					checkBoxState[i] = true;
+				}
+			}
+			
+			try {
+				FileOutputStream fileStream = new FileOutputStream(new File("CheckBox.ser"));
+				ObjectOutputStream os = new ObjectOutputStream(fileStream);
+				os.writeObject(checkBoxState);
+				os.close();
+			} catch(Exception ex) {
+				ex.printStackTrace();
+			}
+		}
+	}
+	
+	public class MyReadInListener implements ActionListener {
+		public void actionPerformed(ActionEvent a) {
+			boolean[] checkBoxState = null;
+			try {
+				FileInputStream fileIn = new FileInputStream(new File("CheckBox.ser"));
+				ObjectInputStream is = new ObjectInputStream(fileIn);
+				checkBoxState = (boolean[]) is.readObject();
+				is.close();
+			} catch(Exception ex) {
+				ex.printStackTrace();
+			}
+			
+			for (int i = 0; i < 256; i++) {
+				JCheckBox check = (JCheckBox) checkBoxList.get(i);
+				if (checkBoxState[i]) {
+					check.setSelected(true);
+				} else {
+					check.setSelected(false);
+				}
+			}
+			
+			sequencer.stop();
+			buildTrackAndStart();
 		}
 	}
 	
