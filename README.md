@@ -1,6 +1,8 @@
 # Beat-Box App
 A java application which lets you create fun sound patters and share it with friends.
 
+Java Programming Language
+
 ## What I Learned
 * Java Swing GUI construction
 * Basics of networking (creating a server, sockets)
